@@ -22,7 +22,7 @@ class UpdateSummary:
     output: int
 
 
-def run_update(paths: Paths, resolvers: tuple[str, ...] = DEFAULT_RESOLVERS, workers: int = 32) -> UpdateSummary:
+def run_update(paths: Paths, resolvers: tuple[str, ...] = DEFAULT_RESOLVERS, workers: int = 64) -> UpdateSummary:
     sources = read_sources(paths.sources)
     fetched_domains, source_results = fetch_all(sources)
 

@@ -49,15 +49,14 @@ def query_mx(domain: str, resolver_ip: str, timeout: float = 4.0) -> str:
 
 
 def classify_domain(domain: str, resolvers: tuple[str, ...] = DEFAULT_RESOLVERS) -> DomainDnsResult:
-    results = {resolver: query_mx(domain, resolver) for resolver in resolvers}
-    statuses = set(results.values())
+    results: dict[str, str] = {}
+    for resolver in resolvers:
+        result = query_mx(domain, resolver)
+        results[resolver] = result
+        if result == "mx":
+            return DomainDnsResult(domain=domain, status=DnsStatus.ACTIVE, resolver_results=results)
 
-    if "mx" in statuses:
-        status = DnsStatus.ACTIVE
-    elif statuses and statuses <= {"nxdomain", "no_mx", "no_nameservers"}:
-        status = DnsStatus.INACTIVE
-    else:
-        status = DnsStatus.UNKNOWN
+    status = DnsStatus.INACTIVE if results else DnsStatus.UNKNOWN
 
     return DomainDnsResult(domain=domain, status=status, resolver_results=results)
 
@@ -71,7 +70,8 @@ def scan_domains(
     inactive: set[str] = set()
     unknown: set[str] = set()
 
-    with ThreadPoolExecutor(max_workers=workers) as executor:
+    max_workers = max(1, workers)
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
         futures = {executor.submit(classify_domain, domain, resolvers): domain for domain in sorted(domains)}
         for future in as_completed(futures):
             result = future.result()

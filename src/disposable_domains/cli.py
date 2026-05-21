@@ -11,7 +11,7 @@ from .pipeline import run_update
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Update disposable email domain outputs.")
     parser.add_argument("--root", type=Path, default=Path.cwd(), help="Repository root path.")
-    parser.add_argument("--workers", type=int, default=32, help="Concurrent DNS scan workers.")
+    parser.add_argument("--workers", type=int, default=64, help="Concurrent DNS scan workers.")
     parser.add_argument(
         "--resolver",
         action="append",

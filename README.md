@@ -25,8 +25,9 @@ runs.
 5. Skip domains already recorded in `cache/inactive_domains.txt`.
 6. Query MX records across multiple public DNS resolvers.
 7. Keep domains with any confirmed MX record.
-8. Keep inconclusive domains to avoid false removals.
-9. Cache only domains where every resolver returns a conclusive inactive result.
+8. Mark a domain inactive when no public resolver returns an MX record, even if
+   the non-MX responses are a mix of NXDOMAIN, no-answer, timeout, or DNS error.
+9. Cache inactive domains so future runs can skip them.
 
 ## Local Development
 
@@ -47,7 +48,7 @@ Run tests:
 Update the generated lists:
 
 ```powershell
-.\.venv\Scripts\update-disposable-domains --workers 32
+.\.venv\Scripts\update-disposable-domains --workers 64
 ```
 
 ## Automation
