@@ -1,8 +1,14 @@
 # Disposable Email Domain List
 
-This is a list of domains frequently associated with disposable email services.
+This repository builds a slim, DNS-validated list of domains associated with
+disposable email services.
 
-This list undergoes regular updates and validation through an MX scan.
+The updater aggregates public disposable-domain feeds, normalizes messy source
+formats, removes known legitimate mail providers from `allowlist.txt`, and keeps
+only domains that either still have MX records or could not be conclusively
+classified as inactive. Domains that every configured public DNS resolver agrees
+are inactive are written to `cache/inactive_domains.txt` and skipped on future
+runs.
 
 ## Download
 
@@ -10,32 +16,63 @@ This list undergoes regular updates and validation through an MX scan.
 
 [JSON format](https://github.com/groundcat/disposable-email-domain-list/raw/master/domains.json)
 
-## What is a disposable email?
+## How It Works
 
-A [disposable email address](http://en.wikipedia.org/wiki/Disposable_email_address), often referred to as DEA, is a type of service that creates unique or random email addresses for each use or entity. Disposable email addresses are typically used only once and are not intended for receiving future emails.
+1. Read source URLs from `config/sources.txt`.
+2. Fetch JSON, plain text, conf-style, whitespace-delimited, or mixed-format domain lists.
+3. Normalize domains, remove duplicates, and discard invalid entries.
+4. Sort and deduplicate `allowlist.txt`, then exclude allowlisted legitimate providers.
+5. Skip domains already recorded in `cache/inactive_domains.txt`.
+6. Query MX records across multiple public DNS resolvers.
+7. Keep domains with any confirmed MX record.
+8. Keep inconclusive domains to avoid false removals.
+9. Cache only domains where every resolver returns a conclusive inactive result.
 
-While disposable email addresses can be used for spam, they also serve legitimate purposes. Some users employ them to protect their privacy or to manage their online identities. As such, the use of disposable email addresses isn't inherently negative or malicious. 
+## Local Development
 
-The repository herein contains a collection of domains associated with active disposable email services, validated at the time of the scan. Administrators might use this list to mitigate potential risks or to ensure that their users are capable of receiving future communications, when it is a crucial aspect of the service provided.
+Always use a virtual environment for local Python commands:
+
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python -m pip install --upgrade pip
+.\.venv\Scripts\python -m pip install -e .[dev]
+```
+
+Run tests:
+
+```powershell
+.\.venv\Scripts\python -m pytest
+```
+
+Update the generated lists:
+
+```powershell
+.\.venv\Scripts\update-disposable-domains --workers 32
+```
+
+## Automation
+
+GitHub Actions runs the updater weekly on Mondays and can also be triggered
+manually. If the generated output passes tests and sanity checks, the workflow
+commits updates to:
+
+- `allowlist.txt`
+- `cache/inactive_domains.txt`
+- `domains.txt`
+- `domains.json`
 
 ## Sources
 
-The raw data is compiled from these [sources](https://github.com/groundcat/disposable-email-domain-list/blob/master/sources.txt).
-
-## Usage
-
-Install Python packages:
-
-    pip3 install -r requirements.txt
-
-Run the script:
-
-    python3 main.py
+The raw data is compiled from the active feeds in `config/sources.txt`. Sources
+that are unavailable, access-blocked, or no longer maintained should be removed
+from that file instead of being carried forward silently.
 
 ## Contribution
 
-While this repository doesn't accept direct contributions of new domains (as it gathers and cleanses data from the listed sources), you can contribute to the community's efforts by adding new disposable domains to ivolo's [disposable-email-domains](https://github.com/ivolo/disposable-email-domains) repository. Please refer to its [contributing section](https://github.com/ivolo/disposable-email-domains#contributing) for more details.
+This repository does not accept direct contributions of new disposable domains;
+it gathers and cleans public source lists. If a legitimate provider appears in
+the output, add it to `allowlist.txt`.
 
 ## License
 
-This project is licensed under the MIT License - read the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See [LICENSE](LICENSE).

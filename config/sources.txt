@@ -1,9 +1,9 @@
+# One source URL per line. Dead or access-blocked feeds should be removed here,
+# not silently tolerated as permanent inputs.
 https://raw.githubusercontent.com/ivolo/disposable-email-domains/master/index.json
 https://raw.githubusercontent.com/ivolo/disposable-email-domains/master/wildcard.json
 https://raw.githubusercontent.com/martenson/disposable-email-domains/master/disposable_email_blocklist.conf
-https://github.com/GeroldSetz/emailondeck.com-domains/raw/master/emailondeck.com_domains_from_bdea.cc.txt
-https://www.stopforumspam.com/downloads/toxic_domains_whole.txt
-https://github.com/zaosoula/email-spam-domains/raw/master/src/custom.txt
+https://raw.githubusercontent.com/GeroldSetz/emailondeck.com-domains/master/emailondeck.com_domains_from_bdea.cc.txt
 https://raw.githubusercontent.com/FGRibreau/mailchecker/master/list.txt
 https://raw.githubusercontent.com/disposable-email-domains/disposable-email-domains/master/disposable_email_blocklist.conf
-https://raw.githubusercontent.com/disposable/disposable/master/blacklist.txt
+https://disposable.github.io/disposable-email-domains/domains.txt

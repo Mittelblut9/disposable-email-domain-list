@@ -1,0 +1,2 @@
+# Domains below were confirmed inactive by consensus across all configured DNS
+# resolvers. The updater keeps this sorted and reuses it to skip future scans.

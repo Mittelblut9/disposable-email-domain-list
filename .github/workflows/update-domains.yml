@@ -1,0 +1,45 @@
+name: Update disposable email domains
+
+on:
+  schedule:
+    - cron: "17 5 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: "pip"
+
+      - name: Install dependencies
+        run: python -m pip install -e .[dev]
+
+      - name: Run tests
+        run: pytest
+
+      - name: Update domain outputs
+        run: update-disposable-domains --workers 64
+
+      - name: Fail if output is unexpectedly small
+        run: |
+          line_count="$(wc -l < domains.txt)"
+          if [ "$line_count" -lt 1000 ]; then
+            echo "domains.txt has only $line_count rows; refusing to commit likely-bad output."
+            exit 1
+          fi
+
+      - name: Commit updated lists
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update disposable email domain list"
+          file_pattern: "allowlist.txt cache/inactive_domains.txt domains.txt domains.json"
